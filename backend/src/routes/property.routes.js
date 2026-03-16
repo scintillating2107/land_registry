@@ -6,7 +6,7 @@ const { query } = require('../db');
 const { requireRole } = require('../middleware/auth');
 const { appendBlock, getBlocksByProperty } = require('../blockchain/blockchain');
 const { computeRiskScore } = require('../services/risk.service');
-const { evaluateFraudForTransfer } = require('../services/fraud.service');
+const { analyzePropertyFraud, evaluateFraudForTransfer } = require('../services/fraud.service');
 const { validateIpfsHash } = require('../services/ipfs.service');
 const {
   onChainRegister,
@@ -24,13 +24,42 @@ const registerSchema = Joi.object({
   ownerUserId: Joi.string().guid({ version: 'uuidv4' }).required(),
   geoCoordinates: Joi.string().required(), // "lat,lng"
   ipfsHash: Joi.string().allow('', null),
+  surveyNumber: Joi.string().allow('', null),
+  state: Joi.string().required(),
+  district: Joi.string().required(),
+  villageWard: Joi.string().required(),
+  landAreaSqM: Joi.number().positive().required(),
+  landType: Joi.string()
+    .valid('RESIDENTIAL', 'AGRICULTURAL', 'COMMERCIAL', 'INDUSTRIAL')
+    .required(),
+  boundaryGeojson: Joi.object({
+    type: Joi.string().valid('Polygon').required(),
+    coordinates: Joi.array()
+      .items(
+        Joi.array().items(Joi.array().items(Joi.number().required()).length(2))
+      )
+      .min(1)
+      .required(),
+  }).required(),
 });
 
 propertyRouter.post('/register', requireRole('REGISTRAR'), async (req, res) => {
   const { error, value } = registerSchema.validate(req.body);
   if (error) return res.status(400).json({ error: true, message: error.message });
 
-  const { propertyId, ownerUserId, geoCoordinates, ipfsHash } = value;
+  const {
+    propertyId,
+    ownerUserId,
+    geoCoordinates,
+    ipfsHash,
+    surveyNumber,
+    state,
+    district,
+    villageWard,
+    landAreaSqM,
+    landType,
+    boundaryGeojson,
+  } = value;
   const ipfsValidation = validateIpfsHash(ipfsHash);
   if (!ipfsValidation.ok) {
     return res.status(400).json({ error: true, message: ipfsValidation.message });
@@ -50,15 +79,53 @@ propertyRouter.post('/register', requireRole('REGISTRAR'), async (req, res) => {
 
   const id = uuidv4();
   await query(
-    `INSERT INTO properties(id, property_id, owner_user_id, geo_coordinates, ipfs_hash)
-     VALUES ($1, $2, $3, $4, $5)`,
-    [id, propertyId, ownerUserId, geoCoordinates, ipfsHash || null]
+    `INSERT INTO properties(
+       id,
+       property_id,
+       owner_user_id,
+       geo_coordinates,
+       ipfs_hash,
+       survey_number,
+       state,
+       district,
+       village_ward,
+       land_area_sq_m,
+       land_type,
+       boundary_geojson
+     )
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+    [
+      id,
+      propertyId,
+      ownerUserId,
+      geoCoordinates,
+      ipfsHash || null,
+      surveyNumber || null,
+      state,
+      district,
+      villageWard,
+      landAreaSqM,
+      landType,
+      boundaryGeojson,
+    ]
   );
 
   const block = await appendBlock({
     txType: 'LAND_REGISTER',
     propertyId,
-    payload: { propertyId, ownerUserId, geoCoordinates, ipfsHash },
+    payload: {
+      propertyId,
+      ownerUserId,
+      geoCoordinates,
+      ipfsHash,
+      surveyNumber,
+      state,
+      district,
+      villageWard,
+      landAreaSqM,
+      landType,
+      boundaryGeojson,
+    },
     createdByUserId: req.user.sub,
   });
 
@@ -136,7 +203,7 @@ propertyRouter.post('/transfer', requireRole('REGISTRAR'), async (req, res) => {
   );
 
   await computeRiskScore(propertyId);
-  const suspicious = await evaluateFraudForTransfer({ propertyId, fromUserId });
+  const fraudAnalysis = await evaluateFraudForTransfer({ propertyId, fromUserId });
 
   if (process.env.USE_EVM_BLOCKCHAIN === 'true') {
     const fromAddress = process.env.EVM_DEFAULT_OWNER_ADDRESS || '0x0000000000000000000000000000000000000000';
@@ -153,7 +220,8 @@ propertyRouter.post('/transfer', requireRole('REGISTRAR'), async (req, res) => {
   res.json({
     property: updatedPropRows[0],
     block,
-    suspicious,
+    suspicious: fraudAnalysis.suspicious,
+    fraudAnalysis,
   });
 });
 
@@ -383,6 +451,10 @@ propertyRouter.get('/:propertyId/audit', async (req, res) => {
     'SELECT * FROM litigations WHERE property_id = $1 ORDER BY created_at ASC',
     [propertyId]
   );
+  const fraudAnalysis = await analyzePropertyFraud({
+    propertyId,
+    expectedOwnerUserId: prop.owner_user_id,
+  });
 
   res.json({
     property: prop,
@@ -390,6 +462,7 @@ propertyRouter.get('/:propertyId/audit', async (req, res) => {
     transfers,
     mortgages,
     litigations,
+    fraudAnalysis,
   });
 });
 

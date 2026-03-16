@@ -3,7 +3,9 @@
 @tailwind utilities;
 
 body {
-  @apply bg-slate-50 text-slate-800 antialiased;
+  @apply bg-gov-bg text-[#2C2C2C] antialiased;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-size: 15px;
 }
 
 @layer components {
@@ -12,7 +14,7 @@ body {
   }
 
   .card {
-    @apply bg-white border border-slate-200 rounded-xl shadow-sm;
+    @apply bg-gov-card border border-gov-border rounded-xl shadow-gov-card;
   }
 
   .input {
@@ -21,7 +23,7 @@ body {
   }
 
   .btn {
-    @apply inline-flex items-center justify-center font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-primary {
@@ -29,7 +31,7 @@ body {
   }
 
   .btn-secondary {
-    @apply bg-white text-slate-800 border border-slate-300 hover:bg-slate-50;
+    @apply bg-white text-slate-800 border border-[#E2E8F0] hover:bg-slate-50;
   }
 }
 
@@ -43,4 +45,5 @@ body {
     }
   }
 }
+
 

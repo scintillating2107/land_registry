@@ -300,7 +300,10 @@ applicationsRouter.post(
     );
 
     await computeRiskScore(app.property_id);
-    const suspicious = await evaluateFraudForTransfer({ propertyId: app.property_id, fromUserId: app.from_user_id });
+    const fraudAnalysis = await evaluateFraudForTransfer({
+      propertyId: app.property_id,
+      fromUserId: app.from_user_id,
+    });
 
     await query(
       `UPDATE transfer_applications
@@ -324,7 +327,8 @@ applicationsRouter.post(
       toUserId: app.to_user_id,
       transferTxBlockId: block.id,
       issuedAt: new Date().toISOString(),
-      suspicious,
+      suspicious: fraudAnalysis.suspicious,
+      fraudAnalysis,
     };
     await query(
       `INSERT INTO certificates(id, certificate_no, type, property_id, application_id, issued_to_user_id, issued_by_user_id, payload)
@@ -355,7 +359,12 @@ applicationsRouter.post(
     const { rows: updated } = await query('SELECT * FROM transfer_applications WHERE id = $1', [id]);
     res.json({
       application: updated[0],
-      transfer: { id: transferId, txBlockId: block.id, suspicious },
+      transfer: {
+        id: transferId,
+        txBlockId: block.id,
+        suspicious: fraudAnalysis.suspicious,
+        fraudAnalysis,
+      },
       certificate: { id: certId, certificateNo, payload },
     });
   }

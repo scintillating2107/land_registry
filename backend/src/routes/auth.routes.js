@@ -92,25 +92,26 @@ authRouter.post('/login', async (req, res) => {
 // Simple endpoint to create demo users if they don't exist (hackathon helper)
 authRouter.post('/seed-demo-users', async (_req, res) => {
   const demoUsers = [
-    { name: 'Alice Citizen', email: 'alice@citizen.test', role: 'CITIZEN' },
-    { name: 'Charlie Citizen', email: 'charlie@citizen.test', role: 'CITIZEN' },
-    { name: 'Bob Registrar', email: 'bob@registrar.test', role: 'REGISTRAR' },
-    { name: 'BankOne', email: 'bank@bank.test', role: 'BANK' },
-    { name: 'CourtOne', email: 'court@court.test', role: 'COURT' },
+    { name: 'Ravi Kumar', email: 'ravi.kumar@gmail.com', role: 'CITIZEN' },
+    { name: 'Priya Sharma', email: 'priya.sharma@gmail.com', role: 'CITIZEN' },
+    { name: 'Suresh Reddy', email: 'suresh.reddy@gmail.com', role: 'REGISTRAR' },
+    { name: 'SBI Land Desk', email: 'sbiland.desk@gmail.com', role: 'BANK' },
+    { name: 'District Court Registry', email: 'court.registry.dl@gmail.com', role: 'COURT' },
   ];
 
+  const demoPassword = 'Bhoomi@2024';
   const created = [];
   for (const u of demoUsers) {
     const { rows } = await query('SELECT * FROM users WHERE email = $1', [u.email]);
     if (rows.length === 0) {
       const id = uuidv4();
-      const password = 'password'; // demo password
+      const password = demoPassword;
       const passwordHash = await bcrypt.hash(password, 10);
       await query(
         'INSERT INTO users(id, name, email, password_hash, role) VALUES ($1, $2, $3, $4, $5)',
         [id, u.name, u.email, passwordHash, u.role]
       );
-      created.push({ ...u, id, password });
+      created.push({ ...u, id, password: demoPassword });
     } else if (rows[0].role !== u.role) {
       // Fix pre-existing demo accounts that have the wrong role.
       await query('UPDATE users SET role = $1 WHERE email = $2', [u.role, u.email]);

@@ -5,14 +5,14 @@ const { query } = require('./index');
 
 async function seed() {
   const demoUsers = [
-    { name: 'Alice Citizen', email: 'alice@citizen.test', role: 'CITIZEN' },
-    { name: 'Charlie Citizen', email: 'charlie@citizen.test', role: 'CITIZEN' },
-    { name: 'Bob Registrar', email: 'bob@registrar.test', role: 'REGISTRAR' },
-    { name: 'BankOne', email: 'bank@bank.test', role: 'BANK' },
-    { name: 'CourtOne', email: 'court@court.test', role: 'COURT' },
+    { name: 'Ravi Kumar', email: 'ravi.kumar@gmail.com', role: 'CITIZEN' },
+    { name: 'Priya Sharma', email: 'priya.sharma@gmail.com', role: 'CITIZEN' },
+    { name: 'Suresh Reddy', email: 'suresh.reddy@gmail.com', role: 'REGISTRAR' },
+    { name: 'SBI Land Desk', email: 'sbiland.desk@gmail.com', role: 'BANK' },
+    { name: 'District Court Registry', email: 'court.registry.dl@gmail.com', role: 'COURT' },
   ];
 
-  const password = 'password';
+  const password = 'Bhoomi@2024';
   const passwordHash = await bcrypt.hash(password, 10);
 
   let created = 0;

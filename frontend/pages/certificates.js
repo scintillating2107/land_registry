@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import axios, { getApiBase, getAuthHeaders } from "@/lib/api";
 import { Layout } from "@/components/Layout";
 
@@ -116,6 +117,9 @@ export default function CertificatesPage() {
                     <div className="text-sm text-slate-700 mt-1">
                       Property: <span className="font-mono">{selected.property_id}</span>
                     </div>
+                    <Link href={`/certificate?certId=${encodeURIComponent(selected.id)}`} className="mt-2 inline-block text-sm font-medium text-primary hover:underline">
+                      View Digital Certificate →
+                    </Link>
                   </div>
                   <div className="text-right text-xs text-slate-600">
                     Issued at

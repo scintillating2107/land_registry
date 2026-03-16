@@ -49,6 +49,14 @@ async function getBlocksByProperty(propertyId) {
   return rows;
 }
 
+async function getAllBlocks(limit = 50, offset = 0) {
+  const { rows } = await query(
+    'SELECT * FROM blocks ORDER BY height DESC LIMIT $1 OFFSET $2',
+    [Math.min(limit, 100), offset]
+  );
+  return rows;
+}
+
 async function verifyChainIntegrity() {
   const { rows } = await query('SELECT * FROM blocks ORDER BY height ASC');
   let prevHash = null;
@@ -65,6 +73,7 @@ async function verifyChainIntegrity() {
 module.exports = {
   appendBlock,
   getBlocksByProperty,
+  getAllBlocks,
   getLatestBlock,
   verifyChainIntegrity,
 };

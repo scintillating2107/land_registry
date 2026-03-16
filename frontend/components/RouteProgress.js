@@ -30,6 +30,8 @@ export function RouteProgress() {
   }, [router.events]);
 
   if (!active) return null;
+  // Do not show progress bar on login page to avoid any overlay
+  if (router.pathname === "/login") return null;
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[9999] h-1 bg-primary/20">

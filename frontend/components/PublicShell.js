@@ -1,35 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react" ;
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 function GovEmblem() {
   return (
     <div className="h-12 w-12 rounded bg-white border border-slate-200 flex items-center justify-center shadow-sm">
-      <svg
-        width="28"
-        height="28"
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-      >
-        <path
-          d="M12 3.25a8.75 8.75 0 1 0 0 17.5 8.75 8.75 0 0 0 0-17.5Z"
-          stroke="#0f172a"
-          strokeWidth="1.3"
-        />
-        <path
-          d="M12 6v12M6 12h12M8 8l8 8M16 8l-8 8"
-          stroke="#0f172a"
-          strokeWidth="1"
-          strokeLinecap="round"
-          opacity="0.7"
-        />
-      </svg>
+      <img
+        src="/images/bhoomichain.jpeg"
+        alt="BhoomiChain logo"
+        className="h-10 w-10 object-contain"
+      />
     </div>
   );
 }
 
-export function PublicShell({ title, subtitle, children }) {
+export function PublicShell({ title, subtitle, children, hideQuickLinks }) {
   const envLabel = process.env.NEXT_PUBLIC_ENV_LABEL || "DEMO";
   const [fontStep, setFontStep] = useState(0); // -1,0,1
   const [today, setToday] = useState("");
@@ -56,58 +41,17 @@ export function PublicShell({ title, subtitle, children }) {
     setToday(new Date().toLocaleDateString());
   }, []);
 
+  const quickLinks = [
+    { href: "/verify", label: "Land Map & Verification", icon: "🗺️" },
+    { href: "/explorer", label: "Blockchain Explorer", icon: "⛓️" },
+    { href: "/applications", label: "Transfer Workflow", icon: "📄" },
+    { href: "/grievance", label: "Disputes & Helpdesk", icon: "⚖️" },
+    { href: "/services", label: "All Features", icon: "✨" },
+    { href: "/demo", label: "Demo Mode", icon: "🎯" },
+  ];
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      {/* Accessibility / utility bar (India.gov-like) */}
-      <div className="bg-slate-100 border-b border-slate-200 text-xs">
-        <div className="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between gap-3">
-          <a
-            href="#main-content"
-            className="gov-link px-2 py-1 rounded focus:outline-none focus:ring-2 focus:ring-primary/30"
-          >
-            Skip to main content
-          </a>
-          <div className="flex items-center gap-2 text-slate-700">
-            <span className="hidden sm:inline">Text size:</span>
-            <button
-              type="button"
-              className="gov-link px-2 py-1 rounded border border-slate-200 bg-white"
-              onClick={() => setFontStep(-1)}
-              aria-label="Decrease text size"
-              title="A-"
-            >
-              A-
-            </button>
-            <button
-              type="button"
-              className="gov-link px-2 py-1 rounded border border-slate-200 bg-white"
-              onClick={() => setFontStep(0)}
-              aria-label="Reset text size"
-              title="A"
-            >
-              A
-            </button>
-            <button
-              type="button"
-              className="gov-link px-2 py-1 rounded border border-slate-200 bg-white"
-              onClick={() => setFontStep(1)}
-              aria-label="Increase text size"
-              title="A+"
-            >
-              A+
-            </button>
-            <span className="hidden md:inline text-slate-500 mx-2">|</span>
-            <span className="hidden md:inline text-slate-600" suppressHydrationWarning>
-              Date: {today || "—"}
-            </span>
-            <span className="hidden md:inline text-slate-500 mx-2">|</span>
-            <span className="hidden md:inline text-slate-600">
-              Environment: {envLabel}
-            </span>
-          </div>
-        </div>
-      </div>
-
       {/* Tricolor accent */}
       <div className="h-1 w-full bg-gradient-to-r from-amber-500 via-white to-emerald-600" />
 
@@ -129,9 +73,9 @@ export function PublicShell({ title, subtitle, children }) {
           </div>
 
           <div className="hidden md:flex items-center gap-2">
-            <div className="relative">
+            <div className="flex items-center gap-2">
               <input
-                className="input text-sm w-72"
+                className="input text-sm w-64 pr-2"
                 placeholder="Search services (e.g. transfer, verify)"
                 aria-label="Search"
                 value={search}
@@ -146,9 +90,7 @@ export function PublicShell({ title, subtitle, children }) {
                   }
                 }}
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">
-                Ctrl+K
-              </div>
+              <span className="text-slate-400 text-xs whitespace-nowrap">Ctrl+K</span>
             </div>
           </div>
         </div>
@@ -157,32 +99,57 @@ export function PublicShell({ title, subtitle, children }) {
         <nav className="bg-primary text-white">
           <div className="max-w-6xl mx-auto px-4 flex items-center gap-1 overflow-x-auto">
             <Link className="px-3 py-2 text-sm hover:bg-primaryDark whitespace-nowrap" href="/">
-              Home
+              Overview
             </Link>
             <Link className="px-3 py-2 text-sm hover:bg-primaryDark whitespace-nowrap" href="/verify">
-              Public Verification
+              Land Map
+            </Link>
+            <Link className="px-3 py-2 text-sm hover:bg-primaryDark whitespace-nowrap" href="/applications">
+              Workflow
+            </Link>
+            <Link className="px-3 py-2 text-sm hover:bg-primaryDark whitespace-nowrap" href="/grievance">
+              Disputes
+            </Link>
+            <Link className="px-3 py-2 text-sm hover:bg-primaryDark whitespace-nowrap" href="/services">
+              Features
             </Link>
             <Link className="px-3 py-2 text-sm hover:bg-primaryDark whitespace-nowrap" href="/register">
               Register
             </Link>
             <Link className="ml-auto px-3 py-2 text-sm hover:bg-primaryDark whitespace-nowrap" href="/login">
-              Sign in
+              Authority Portal
             </Link>
           </div>
         </nav>
       </header>
 
       <section id="main-content" className="max-w-6xl mx-auto px-4 py-8">
-        <div className="mb-6">
-          {title && (
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
-              {title}
-            </h1>
-          )}
-          {subtitle && (
-            <p className="text-slate-600 mt-2 max-w-2xl">{subtitle}</p>
-          )}
-        </div>
+        {!hideQuickLinks && (
+          <div className="mb-5 flex flex-wrap gap-2">
+            {quickLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:border-primary hover:text-primary transition"
+              >
+                <span aria-hidden="true">{item.icon}</span>
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        )}
+        {(title || subtitle) && (
+          <div className="mb-6">
+            {title && (
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+                {title}
+              </h1>
+            )}
+            {subtitle && (
+              <p className="text-slate-600 mt-2 max-w-2xl">{subtitle}</p>
+            )}
+          </div>
+        )}
 
         {children}
       </section>
