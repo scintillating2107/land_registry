@@ -188,9 +188,9 @@ export default function LandingPage() {
             </div>
             <div className="animate-fade-in flex justify-center opacity-0" style={{ animationDelay: "0.15s", animationFillMode: "forwards" }}>
               <img
-                src="/images/hero-land-map.png"
+                src="/images/Digital land parcel map on BhoomiChain.jpeg"
                 alt="Digital land parcel map on BhoomiChain"
-                className="w-full max-w-md rounded-xl shadow-lg border border-slate-200 object-cover"
+                className="w-full max-w-2xl rounded-xl shadow-lg border border-slate-200 object-cover"
               />
             </div>
           </div>
@@ -254,8 +254,8 @@ export default function LandingPage() {
             A single, tamper-proof digital land registry on blockchain. Every property gets a unique record; ownership changes, mortgage locks, and court freezes are recorded immutably. Citizens, banks, and courts access one source of truth—reducing fraud, disputes, and delays.
           </p>
           <div className="mt-8 flex justify-center">
-            <img
-              src="/images/land-registry-workflow.png"
+              <img
+              src="/images/End-to-end land registry workflow on BhoomiChain.jpeg"
               alt="End-to-end land registry workflow on BhoomiChain"
               className="w-full max-w-3xl rounded-lg shadow-md border border-slate-200"
             />
@@ -358,10 +358,10 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-10 items-center">
           <div>
             <img
-              src="/images/land-dashboard.png"
-              alt="Digital land record dashboard"
-              className="w-full rounded-lg shadow-md border border-slate-200"
-            />
+                src="/images/Digital land record dashboard.jpeg"
+                alt="Digital land record dashboard"
+                className="w-full rounded-lg shadow-md border border-slate-200"
+              />
           </div>
           <div>
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Digital Land Record Dashboard</h2>
@@ -406,7 +406,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-10 items-center">
           <div>
             <img
-              src="/images/land-plots-aerial.jpg"
+              src="/images/Aerial view of land plots.jpeg"
               alt="Aerial view of land plots"
               className="w-full rounded-lg shadow-md border border-slate-200 object-cover"
             />

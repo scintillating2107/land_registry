@@ -1,8 +1,105 @@
 const express = require('express');
 const { query } = require('../db');
 const { requireRole } = require('../middleware/auth');
+const { verifyChainIntegrity } = require('../blockchain/blockchain');
 
 const reportsRouter = express.Router();
+
+reportsRouter.get('/system-logs', requireRole('REGISTRAR'), async (req, res) => {
+  const limit = Math.min(Number(req.query.limit) || 50, 200);
+
+  const [
+    chainOk,
+    { rows: blocks },
+    { rows: applications },
+    { rows: transfers },
+    { rows: certificates },
+    { rows: payments },
+    { rows: notifications },
+    { rows: grievances },
+  ] = await Promise.all([
+    verifyChainIntegrity().catch(() => false),
+    query(
+      `SELECT b.*, u.name AS created_by_name, u.role AS created_by_role
+       FROM blocks b
+       LEFT JOIN users u ON u.id = b.created_by_user_id
+       ORDER BY b.created_at DESC
+       LIMIT $1`,
+      [limit]
+    ),
+    query(
+      `SELECT a.*,
+              u1.name AS from_name, u1.email AS from_email,
+              u2.name AS to_name, u2.email AS to_email,
+              r.name AS reviewed_by_name
+       FROM transfer_applications a
+       JOIN users u1 ON u1.id = a.from_user_id
+       JOIN users u2 ON u2.id = a.to_user_id
+       LEFT JOIN users r ON r.id = a.reviewed_by_user_id
+       ORDER BY a.created_at DESC
+       LIMIT $1`,
+      [limit]
+    ),
+    query(
+      `SELECT t.*,
+              u1.name AS from_name, u2.name AS to_name
+       FROM transfers t
+       JOIN users u1 ON u1.id = t.from_user_id
+       JOIN users u2 ON u2.id = t.to_user_id
+       ORDER BY t.created_at DESC
+       LIMIT $1`,
+      [limit]
+    ),
+    query(
+      `SELECT c.*,
+              iu.name AS issued_to_name,
+              ib.name AS issued_by_name
+       FROM certificates c
+       JOIN users iu ON iu.id = c.issued_to_user_id
+       JOIN users ib ON ib.id = c.issued_by_user_id
+       ORDER BY c.issued_at DESC
+       LIMIT $1`,
+      [limit]
+    ),
+    query(
+      `SELECT p.*, u.name AS user_name, u.role AS user_role
+       FROM payments p
+       JOIN users u ON u.id = p.user_id
+       ORDER BY p.created_at DESC
+       LIMIT $1`,
+      [limit]
+    ),
+    query(
+      `SELECT n.*, u.name AS user_name, u.role AS user_role
+       FROM notifications n
+       JOIN users u ON u.id = n.user_id
+       ORDER BY n.created_at DESC
+       LIMIT $1`,
+      [limit]
+    ),
+    query(
+      `SELECT g.*, u.name AS closed_by_name
+       FROM grievances g
+       LEFT JOIN users u ON u.id = g.closed_by_user_id
+       ORDER BY g.created_at DESC
+       LIMIT $1`,
+      [limit]
+    ),
+  ]);
+
+  res.json({
+    generatedAt: new Date().toISOString(),
+    chainIntegrity: chainOk,
+    limit,
+    blocks,
+    transferApplications: applications,
+    transfers,
+    certificates,
+    payments,
+    notifications,
+    grievances,
+  });
+});
 
 reportsRouter.get('/kpis', requireRole('REGISTRAR'), async (_req, res) => {
   const [
