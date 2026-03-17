@@ -8,7 +8,7 @@ const GOV_TEXT = "#2C2C2C";
 function Logo({ className = "h-10 w-10" }) {
   return (
     <img
-      src="/images/bhoomichain.jpeg"
+      src="/images/bhoomichain.png"
       alt="BhoomiChain logo"
       className={className}
     />
@@ -285,6 +285,11 @@ export function Layout({ children }) {
               className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && searchQuery.trim()) {
+                  router.push(`/verify?q=${encodeURIComponent(searchQuery.trim())}`);
+                }
+              }}
             />
           </div>
           <div className="flex-1 py-8 px-6 lg:py-12 lg:px-10 overflow-auto max-w-[1600px]">{children}</div>

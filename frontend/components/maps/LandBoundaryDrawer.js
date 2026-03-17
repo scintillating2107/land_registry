@@ -1,11 +1,78 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import L from "leaflet";
 import "leaflet-draw";
 
-const DEFAULT_CENTER = { lat: 22.9734, lng: 78.6569 }; // India centroid-ish
+// Default to Lucknow, Uttar Pradesh for demo hackathon
+const DEFAULT_CENTER = { lat: 26.8467, lng: 80.9462 };
+
+function LocationSearch() {
+  const map = useMap();
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSearch(e) {
+    e.preventDefault();
+    const q = query.trim();
+    if (!q || !map) return;
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          q
+        )}&countrycodes=in&limit=1`
+      );
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        const { lat, lon } = data[0];
+        const latNum = parseFloat(lat);
+        const lonNum = parseFloat(lon);
+        if (!Number.isNaN(latNum) && !Number.isNaN(lonNum)) {
+          map.setView([latNum, lonNum], 16);
+        }
+      } else {
+        setError("Location not found");
+      }
+    } catch {
+      setError("Search failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="leaflet-top leaflet-right">
+      <form
+        onSubmit={handleSearch}
+        className="m-2 flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 shadow-sm border border-gray-200"
+      >
+        <input
+          type="text"
+          placeholder="Search place (e.g. Gomti Nagar, Lucknow)"
+          className="text-[11px] px-1 py-0.5 border-none focus:outline-none bg-transparent placeholder-gray-400"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="text-[11px] px-2 py-0.5 rounded bg-primary text-white disabled:opacity-60"
+        >
+          Go
+        </button>
+      </form>
+      {error && (
+        <div className="m-2 px-2 py-1 rounded bg-red-50 border border-red-200 text-[10px] text-red-700 shadow-sm">
+          {error}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function DrawControl({ onChange }) {
   const map = useMap();
@@ -113,6 +180,7 @@ export default function LandBoundaryDrawer({ initialCenter, onChange }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
       />
+      <LocationSearch />
       <DrawControl onChange={onChange} />
     </MapContainer>
   );

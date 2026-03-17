@@ -65,11 +65,15 @@ export default function DashboardPage() {
     surveyNumber: "",
     district: "",
     landArea: "",
-    coordinates: "12.9716,77.5946",
+    // Default to Lucknow, Uttar Pradesh for demo
+    coordinates: "26.8467,80.9462",
     documentNote: "",
   });
   const [registering, setRegistering] = useState(false);
   const [toast, setToast] = useState({ message: "", type: "success" });
+  const [saleDeedFile, setSaleDeedFile] = useState(null);
+  const [titleCertFile, setTitleCertFile] = useState(null);
+  const [surveyMapFile, setSurveyMapFile] = useState(null);
 
   const headers = useMemo(() => ({ headers: authHeaders() }), []);
 
@@ -147,7 +151,7 @@ export default function DashboardPage() {
         {
           propertyId,
           ownerUserId: citizen.id,
-          geoCoordinates: registerForm.coordinates || "12.9716,77.5946",
+          geoCoordinates: registerForm.coordinates || "26.8467,80.9462",
           ipfsHash: "QmDemoDocumentHash",
         },
         { headers: authHeaders() }
@@ -156,7 +160,7 @@ export default function DashboardPage() {
       setSelectedPropertyId(propertyId);
       loadAudit(propertyId);
       loadApplicationsInbox();
-      setRegisterForm({ ownerName: "", ownerAadhaar: "", surveyNumber: "", district: "", landArea: "", coordinates: "12.9716,77.5946", documentNote: "" });
+      setRegisterForm({ ownerName: "", ownerAadhaar: "", surveyNumber: "", district: "", landArea: "", coordinates: "26.8467,80.9462", documentNote: "" });
     } catch (err) {
       showToast(err.response?.data?.message || "Registration failed", "error");
     } finally {
@@ -340,7 +344,7 @@ export default function DashboardPage() {
             {selectedPropertyId && (
               <SectionCard title="Map — Selected Property">
                 <div className="h-64 rounded-lg overflow-hidden border border-gray-200">
-                  <MapView coordinates={audit?.property?.geo_coordinates || "12.9716,77.5946"} />
+                  <MapView coordinates={audit?.property?.geo_coordinates || "26.8467,80.9462"} />
                 </div>
               </SectionCard>
             )}
@@ -431,8 +435,59 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Upload Land Documents</label>
-                  <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Document reference (demo)" readOnly />
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Section 4 — Document Upload</label>
+                  <div className="space-y-3 bg-gray-50 rounded-lg border border-gray-200 p-3">
+                    <div>
+                      <div className="text-xs font-medium text-gray-600 mb-1">Sale Deed</div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          className="text-xs"
+                          onChange={(e) => setSaleDeedFile(e.target.files?.[0] || null)}
+                        />
+                        {saleDeedFile && (
+                          <span className="text-[11px] text-gray-500 truncate max-w-[160px]">
+                            ✓ {saleDeedFile.name}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-xs font-medium text-gray-600 mb-1">Land Title Certificate</div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          className="text-xs"
+                          onChange={(e) => setTitleCertFile(e.target.files?.[0] || null)}
+                        />
+                        {titleCertFile && (
+                          <span className="text-[11px] text-gray-500 truncate max-w-[160px]">
+                            ✓ {titleCertFile.name}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-xs font-medium text-gray-600 mb-1">Survey Map</div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          className="text-xs"
+                          onChange={(e) => setSurveyMapFile(e.target.files?.[0] || null)}
+                        />
+                        {surveyMapFile && (
+                          <span className="text-[11px] text-gray-500 truncate max-w-[160px]">
+                            ✓ {surveyMapFile.name}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <button
                   type="submit"
@@ -459,7 +514,10 @@ export default function DashboardPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {applications.slice(0, 10).map((a) => (
+                    {applications
+                      .filter((a) => a.status === "SUBMITTED" || a.status === "UNDER_REVIEW")
+                      .slice(0, 10)
+                      .map((a) => (
                       <tr key={a.id} className="border-b border-gray-100">
                         <td className="py-2 pr-2 font-mono">{a.property_id || "—"}</td>
                         <td className="py-2 pr-2">{a.from_user_id?.slice(0, 8) || "—"}</td>
@@ -467,14 +525,24 @@ export default function DashboardPage() {
                         <td className="py-2 pr-2">{a.created_at ? new Date(a.created_at).toLocaleDateString() : "—"}</td>
                         <td className="py-2 pr-2">{a.status}</td>
                         <td className="py-2 pr-2">
-                          <span className="inline-flex gap-2">
-                            <Link href={`/property/${encodeURIComponent(a.property_id)}`} className="text-xs font-medium hover:underline" style={{ color: GOV_BLUE }}>View</Link>
-                            <Link href="/applications" className="text-primary text-xs font-medium hover:underline">Approve / Reject</Link>
+                          <span className="inline-flex flex-col sm:flex-row gap-1 sm:gap-2">
+                            <Link
+                              href={`/applications?applicationId=${encodeURIComponent(a.id)}`}
+                              className="text-xs font-medium text-white px-2.5 py-1.5 rounded bg-primary hover:opacity-90 text-center"
+                            >
+                              Review / Approve
+                            </Link>
+                            <Link
+                              href={`/property/${encodeURIComponent(a.property_id)}`}
+                              className="text-xs font-medium hover:underline text-primary text-center"
+                            >
+                              View Property
+                            </Link>
                           </span>
                         </td>
                       </tr>
                     ))}
-                    {applications.length === 0 && (
+                    {applications.filter((a) => a.status === "SUBMITTED" || a.status === "UNDER_REVIEW").length === 0 && (
                       <tr><td colSpan={6} className="py-4 text-gray-500 text-center">No pending transfers</td></tr>
                     )}
                   </tbody>

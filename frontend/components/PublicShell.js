@@ -6,7 +6,7 @@ function GovEmblem() {
   return (
     <div className="h-12 w-12 rounded bg-white border border-slate-200 flex items-center justify-center shadow-sm">
       <img
-        src="/images/bhoomichain.jpeg"
+        src="/images/bhoomichain.png"
         alt="BhoomiChain logo"
         className="h-10 w-10 object-contain"
       />

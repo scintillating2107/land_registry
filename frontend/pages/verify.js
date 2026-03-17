@@ -118,6 +118,31 @@ export default function VerifyPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query.propertyId]);
 
+  // When coming from the global search bar (?q=...), decide whether it looks like a Property ID
+  // or a Survey Number search and trigger the appropriate verification path.
+  useEffect(() => {
+    const raw = router.query.q;
+    if (typeof raw !== "string") return;
+    const q = raw.trim();
+    if (!q) return;
+
+    // Heuristic: treat as Property ID if it contains both letters and numbers and a dash,
+    // or starts with common id prefixes like PROP-/BC-/LP-
+    const looksLikePropertyId =
+      /^PROP-|^BC-|^LP-/i.test(q) ||
+      (/[A-Za-z]/.test(q) && /\d/.test(q) && q.includes("-"));
+
+    if (looksLikePropertyId) {
+      setPropertyIdInput(q);
+      verifyByPropertyId(null, q);
+    } else {
+      setSurveyNumber(q);
+      // keep any existing district/state filters as-is
+      searchBySurveyDistrictState(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.query.q]);
+
   async function verifyByPropertyId(e, overrideId) {
     e?.preventDefault();
     const id = (overrideId != null ? overrideId : propertyIdInput).toString().trim();

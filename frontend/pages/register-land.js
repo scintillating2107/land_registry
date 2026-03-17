@@ -58,13 +58,15 @@ export default function RegisterLandPage() {
   const [surveyNumber, setSurveyNumber] = useState("");
   const [parcelId, setParcelId] = useState("");
   const [district, setDistrict] = useState("");
-  const [state, setState] = useState("Karnataka");
+  // Default to Uttar Pradesh for demo instead of Karnataka
+  const [state, setState] = useState("Uttar Pradesh");
   const [villageWard, setVillageWard] = useState("");
   const [landArea, setLandArea] = useState("");
   const [landType, setLandType] = useState("RESIDENTIAL");
 
-  const [latitude, setLatitude] = useState("12.9716");
-  const [longitude, setLongitude] = useState("77.5946");
+  // Default to Lucknow, Uttar Pradesh for demo
+  const [latitude, setLatitude] = useState("26.8467");
+  const [longitude, setLongitude] = useState("80.9462");
   const [boundaryArea, setBoundaryArea] = useState("");
   const [boundary, setBoundary] = useState(null);
 
@@ -554,7 +556,7 @@ export default function RegisterLandPage() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
-                href={`/dashboard`}
+                href={successResult.propertyId ? `/property/${encodeURIComponent(successResult.propertyId)}` : "/dashboard"}
                 className="flex-1 py-2.5 rounded-lg text-center font-semibold text-white hover:opacity-90"
                 style={{ backgroundColor: GOV_BLUE }}
                 onClick={() => setShowSuccessModal(false)}

@@ -314,6 +314,45 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* SMART CONTRACT GUARDRAILS */}
+      <section className="py-16 bg-white border-t border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-8 items-start">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">
+              Smart contract guardrails for transfers
+            </h2>
+            <p className="text-sm text-slate-600 mb-4 max-w-xl">
+              Every land transfer on BhoomiChain is executed by a smart contract that enforces basic
+              registry rules before ownership can change. If any rule fails, the transfer is blocked.
+            </p>
+            <ul className="space-y-1.5 text-sm text-slate-700">
+              <li>• Seller must be the current registered owner.</li>
+              <li>• No active mortgage lock on the property.</li>
+              <li>• No active litigation freeze or dispute flag.</li>
+              <li>• Only then is ownership written to the blockchain ledger.</li>
+            </ul>
+          </div>
+          <div>
+            <div className="text-xs font-semibold text-slate-700 mb-2 uppercase tracking-wide">
+              Simplified transferLand smart contract
+            </div>
+            <pre className="overflow-auto rounded-lg border border-slate-800 bg-slate-950 p-4 text-[11px] leading-5 text-slate-200">
+{`function transferLand(propertyId, seller, buyer) {
+  require(seller == currentOwner);
+  require(mortgageStatus == NONE);
+  require(litigationStatus == NONE);
+  require(disputed == false);
+  transferOwnership(propertyId, buyer);
+}`}
+            </pre>
+            <p className="mt-2 text-[11px] text-slate-500">
+              This makes the transfer explainable for judges and auditors: identity, documents,
+              mortgage clearance, and dispute status are checked before the blockchain record is updated.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* DASHBOARD PREVIEW */}
       <section className="py-16 bg-white border-t border-slate-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-10 items-center">

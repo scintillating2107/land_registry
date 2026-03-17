@@ -30,10 +30,22 @@ function Icon({ d, className = "h-5 w-5" }) {
 
 function GovEmblem() {
   return (
-    <div className="w-14 h-14 rounded-full border-2 flex items-center justify-center flex-shrink-0" style={{ borderColor: GOV_BLUE }}>
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke={GOV_BLUE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
+    <div className="flex items-center gap-3 flex-shrink-0">
+      <div className="w-14 h-14 rounded-full border-2 flex items-center justify-center bg-white" style={{ borderColor: GOV_BLUE }}>
+        <img
+          src="/images/bhoomichain.png"
+          alt="BhoomiChain logo"
+          className="w-10 h-10 object-contain"
+        />
+      </div>
+      <div className="hidden sm:block">
+        <div className="text-[10px] uppercase tracking-wide text-gray-500">
+          BhoomiChain – National Blockchain Land Registry
+        </div>
+        <div className="text-xs text-gray-500">
+          Digital Land Governance Prototype
+        </div>
+      </div>
     </div>
   );
 }

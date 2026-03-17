@@ -1,7 +1,8 @@
 import { MapContainer, Polygon, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-const CENTER = [12.9716, 77.5946]; // Bengaluru demo center
+// Default center: Lucknow, Uttar Pradesh for hackathon demo
+const CENTER = [26.8467, 80.9462];
 
 // Simple demo parcels with survey number and owner
 const PARCELS = [
@@ -11,11 +12,12 @@ const PARCELS = [
     owner: "Ravi Kumar",
     area: "1200 sq m",
     txId: "BLOCK-123456",
+    // Sample parcel near Lucknow (approximate demo coordinates)
     coords: [
-      [12.9721, 77.5939],
-      [12.9723, 77.5944],
-      [12.9718, 77.5947],
-      [12.9715, 77.5942],
+      [26.8472, 80.9458],
+      [26.8474, 80.9463],
+      [26.8469, 80.9466],
+      [26.8467, 80.9461],
     ],
   },
   {
@@ -25,10 +27,10 @@ const PARCELS = [
     area: "950 sq m",
     txId: "BLOCK-987654",
     coords: [
-      [12.9714, 77.5951],
-      [12.9717, 77.5955],
-      [12.9713, 77.5959],
-      [12.9710, 77.5954],
+      [26.8463, 80.9470],
+      [26.8466, 80.9474],
+      [26.8462, 80.9478],
+      [26.8459, 80.9473],
     ],
   },
 ];
